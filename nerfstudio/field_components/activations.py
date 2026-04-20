@@ -35,7 +35,7 @@ class _TruncExp(Function):
         return torch.exp(x)
 
     @staticmethod
-    @custom_bwd(device_type= "cuda" if torch.cuda.is_available() else "cpu")
+    @custom_bwd
     def backward(ctx, g):
         x = ctx.saved_tensors[0]
         return g * torch.exp(x.clamp(-15, 15))
