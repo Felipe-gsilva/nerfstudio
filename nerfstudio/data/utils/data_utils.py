@@ -37,7 +37,6 @@ def pil_to_numpy(im: PILImage) -> np.ndarray:
     return np.array(im)
 
 
-
 def get_image_mask_tensor_from_path(filepath: Union[Path, IO[bytes]], scale_factor: float = 1.0) -> torch.Tensor:
     """
     Utility function to read a mask image from the given path and return a boolean tensor

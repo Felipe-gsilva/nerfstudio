@@ -501,7 +501,9 @@ class LocalWriter:
             latest_map: the most recent dictionary of stats that have been recorded
             padding: type of characters to print to pad open space
         """
-        step = GLOBAL_BUFFER["step"]
+        step = GLOBAL_BUFFER.get("step")
+        if step is None:
+            return
         fraction_done = step / GLOBAL_BUFFER["max_iter"]
         curr_mssg = f"{step} ({fraction_done * 100:.02f}%)"
         curr_mssg = f"{curr_mssg:<20}"
