@@ -23,6 +23,7 @@ import sys
 from pathlib import Path
 from typing import Callable, Literal, Optional, Tuple
 
+from nerfstudio.configs.experiment_config import ExperimentConfig
 import torch
 import yaml
 
@@ -32,7 +33,7 @@ from nerfstudio.pipelines.base_pipeline import Pipeline
 from nerfstudio.utils.rich_utils import CONSOLE
 
 
-def eval_load_checkpoint(config: TrainerConfig, pipeline: Pipeline) -> Tuple[Path, int]:
+def eval_load_checkpoint(config: TrainerConfig | ExperimentConfig, pipeline: Pipeline) -> Tuple[Path, int]:
     ## TODO: ideally eventually want to get this to be the same as whatever is used to load train checkpoint too
     """Helper function to load checkpointed pipeline
 
@@ -69,8 +70,10 @@ def eval_setup(
     config_path: Path,
     eval_num_rays_per_chunk: Optional[int] = None,
     test_mode: Literal["test", "val", "inference"] = "test",
-    update_config_callback: Optional[Callable[[TrainerConfig], TrainerConfig]] = None,
-) -> Tuple[TrainerConfig, Pipeline, Path, int]:
+    update_config_callback: Optional[
+        Callable[[TrainerConfig | ExperimentConfig], TrainerConfig | ExperimentConfig]
+    ] = None,
+) -> Tuple[TrainerConfig | ExperimentConfig, Pipeline, Path, int]:
     """Shared setup for loading a saved pipeline for evaluation.
 
     Args:
@@ -88,7 +91,8 @@ def eval_setup(
     """
     # load save config
     config = yaml.load(config_path.read_text(), Loader=yaml.Loader)
-    assert isinstance(config, TrainerConfig)
+    # trying ExperimentConfig first since MERFTrainerConfig uses it
+    assert isinstance(config, TrainerConfig) or isinstance(config, ExperimentConfig)
 
     config.pipeline.datamanager._target = all_methods[config.method_name].pipeline.datamanager._target
     if eval_num_rays_per_chunk:
